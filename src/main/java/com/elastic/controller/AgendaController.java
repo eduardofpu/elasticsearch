@@ -16,9 +16,7 @@ import java.io.IOException;
 @RequestMapping("/agenda")
 public class AgendaController {
 
-
     private AgendaService agendaService;
-
     private AgendaRepository agendaRepository;
 
     @Autowired
@@ -30,7 +28,6 @@ public class AgendaController {
     @RequestMapping(path = "/create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public Agenda createAgenda(@RequestBody Agenda request) throws IOException {
-
         agendaRepository.save(request);
         this.agendaService.agendaCreate(request);
         return request;
@@ -53,8 +50,6 @@ public class AgendaController {
     @RequestMapping(path = "/update", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public ElasticUpdateReturn agendaUpdate(@RequestBody AgendaRequest request, @RequestHeader Long id) throws IOException {
-
-
         ElasticUpdateReturn search = agendaService.agendaUpdate(request, id);
         return search;
     }
