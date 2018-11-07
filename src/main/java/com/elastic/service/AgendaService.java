@@ -1,9 +1,9 @@
 package com.elastic.service;
 
+import com.elastic.elasticsearch.ElasticSeachReturn;
 import com.elastic.elasticsearch.ElasticSearchResponse;
 import com.elastic.model.Agenda;
 import com.elastic.model.AgendaRequest;
-import com.elastic.repository.AgendaRepository;
 import com.google.gson.Gson;
 import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.NStringEntity;
@@ -15,31 +15,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 @Service
 public class AgendaService {
 
     private static final Logger LOGGER = Logger.getLogger(indexService.class);
 
-    private AgendaRepository agendaRepository;
     private RestClient restClient;
     private Gson gson;
 
     @Autowired
-    public AgendaService(AgendaRepository agendaRepository, RestClient restClient) {
-        this.agendaRepository = agendaRepository;
+    public AgendaService(RestClient restClient) {
         this.restClient = restClient;
         this.gson = new Gson();
     }
 
-    public void agendaPost(Agenda request) {
+    public void agendaCreate(Agenda request) {
         String params = gson.toJson(request);
         requestPostAgenda(request, params);
     }
 
-    public ElasticSearchResponse getSearch() {
-        return getElasticSearchResponse();
+    public ElasticSearchResponse agendaSearch() {
+        return getElasticSearch();
     }
 
 
@@ -49,8 +46,14 @@ public class AgendaService {
         return getElasticSearchPrefixe(params);
     }
 
+    public ElasticSeachReturn agendaUpdate(AgendaRequest request, Long id) {
 
-    private ElasticSearchResponse getElasticSearchResponse() {
+        String params = "{\"doc\" : " + gson.toJson(request) +"}";
+        return getElasticUpdade(params, id);
+    }
+
+
+    private ElasticSearchResponse getElasticSearch() {
         try (NStringEntity entity = new NStringEntity("", ContentType.APPLICATION_JSON)) {
             Response response = restClient.performRequest("GET", "/agenda/doc/_search", new HashMap<>(), entity);
             String json = EntityUtils.toString(response.getEntity());
@@ -81,11 +84,25 @@ public class AgendaService {
 
     private void requestPostAgenda(Agenda request, String params) {
         try (NStringEntity entity = new NStringEntity(params, ContentType.APPLICATION_JSON)) {
-            agendaRepository.save(request);
-            restClient.performRequest("POST", "/agenda/doc", new HashMap<>(), entity);
+            restClient.performRequest("POST", "/agenda/doc/"+request.getId(), new HashMap<>(), entity);
 
         } catch (Exception e) {
             LOGGER.error("Erro ao criar dados no elastic.", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private ElasticSeachReturn getElasticUpdade(String params, Long id) {
+
+        try (NStringEntity entity = new NStringEntity(params, ContentType.APPLICATION_JSON)) {
+            Response response = restClient.performRequest("POST", "/agenda/doc/"+id+"/_update", new HashMap<>(), entity);
+            String json = EntityUtils.toString(response.getEntity());
+
+            ElasticSeachReturn results = gson.fromJson(json, ElasticSeachReturn.class);
+            return results;
+
+        } catch (Exception e) {
+            LOGGER.error("Erro ao buscar os  dados no ElasticSearch.", e);
             throw new RuntimeException(e);
         }
     }
