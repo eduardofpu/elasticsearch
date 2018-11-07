@@ -1,6 +1,6 @@
 package com.elastic.controller;
 
-import com.elastic.elasticsearch.ElasticSeachReturn;
+import com.elastic.elasticsearch.ElasticUpdateReturn;
 import com.elastic.model.Agenda;
 import com.elastic.elasticsearch.ElasticSearchResponse;
 import com.elastic.model.AgendaRequest;
@@ -38,24 +38,24 @@ public class AgendaController {
 
     @RequestMapping(path = "/search", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public ElasticSearchResponse getSearch() throws IOException {
+    public ElasticSearchResponse agendaSearch() throws IOException {
         ElasticSearchResponse search = agendaService.agendaSearch();
         return search;
     }
 
     @RequestMapping(path = "/prefix", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public ElasticSearchResponse getSearchPrefix(@RequestBody AgendaRequest request) throws IOException {
-        ElasticSearchResponse search = agendaService.getSearchPrefix(request);
+    public ElasticSearchResponse agendaSearchPrefix(@RequestBody AgendaRequest request) throws IOException {
+        ElasticSearchResponse search = agendaService.agendaSearchPrefix(request);
         return search;
     }
 
     @RequestMapping(path = "/update", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public ElasticSeachReturn AgendaUpdate(@RequestBody AgendaRequest request, @RequestHeader Long id) throws IOException {
+    public ElasticUpdateReturn agendaUpdate(@RequestBody AgendaRequest request, @RequestHeader Long id) throws IOException {
 
 
-        ElasticSeachReturn search = agendaService.agendaUpdate(request, id);
+        ElasticUpdateReturn search = agendaService.agendaUpdate(request, id);
         return search;
     }
 }

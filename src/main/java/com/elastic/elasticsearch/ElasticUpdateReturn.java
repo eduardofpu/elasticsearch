@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.io.Serializable;
 
 @Getter
-public class ElasticSeachReturn<T> implements Serializable{
+public class ElasticUpdateReturn<T> implements Serializable{
 
      private T _index;
      private T _type;

@@ -1,6 +1,6 @@
 package com.elastic.service;
 
-import com.elastic.elasticsearch.ElasticSeachReturn;
+import com.elastic.elasticsearch.ElasticUpdateReturn;
 import com.elastic.elasticsearch.ElasticSearchResponse;
 import com.elastic.model.Agenda;
 import com.elastic.model.AgendaRequest;
@@ -40,13 +40,13 @@ public class AgendaService {
     }
 
 
-    public ElasticSearchResponse getSearchPrefix(AgendaRequest request) {
+    public ElasticSearchResponse agendaSearchPrefix(AgendaRequest request) {
 
         String params = "{\"query\" : {\"match_phrase_prefix\": " + gson.toJson(request) + " }}";
         return getElasticSearchPrefixe(params);
     }
 
-    public ElasticSeachReturn agendaUpdate(AgendaRequest request, Long id) {
+    public ElasticUpdateReturn agendaUpdate(AgendaRequest request, Long id) {
 
         String params = "{\"doc\" : " + gson.toJson(request) +"}";
         return getElasticUpdade(params, id);
@@ -92,13 +92,13 @@ public class AgendaService {
         }
     }
 
-    private ElasticSeachReturn getElasticUpdade(String params, Long id) {
+    private ElasticUpdateReturn getElasticUpdade(String params, Long id) {
 
         try (NStringEntity entity = new NStringEntity(params, ContentType.APPLICATION_JSON)) {
             Response response = restClient.performRequest("POST", "/agenda/doc/"+id+"/_update", new HashMap<>(), entity);
             String json = EntityUtils.toString(response.getEntity());
 
-            ElasticSeachReturn results = gson.fromJson(json, ElasticSeachReturn.class);
+            ElasticUpdateReturn results = gson.fromJson(json, ElasticUpdateReturn.class);
             return results;
 
         } catch (Exception e) {
