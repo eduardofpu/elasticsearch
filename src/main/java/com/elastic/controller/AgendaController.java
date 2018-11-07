@@ -1,5 +1,6 @@
 package com.elastic.controller;
 
+import com.elastic.elasticsearch.ElasticDeleteReturn;
 import com.elastic.elasticsearch.ElasticUpdateReturn;
 import com.elastic.model.Agenda;
 import com.elastic.elasticsearch.ElasticSearchResponse;
@@ -51,6 +52,13 @@ public class AgendaController {
     @ResponseStatus(HttpStatus.CREATED)
     public ElasticUpdateReturn agendaUpdate(@RequestBody AgendaRequest request, @RequestHeader Long id) throws IOException {
         ElasticUpdateReturn search = agendaService.agendaUpdate(request, id);
+        return search;
+    }
+
+    @RequestMapping(path = "/delete", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public ElasticDeleteReturn agendaDelete(@RequestHeader Long id) throws IOException {
+        ElasticDeleteReturn search = agendaService.agendaUpdate(id);
         return search;
     }
 }

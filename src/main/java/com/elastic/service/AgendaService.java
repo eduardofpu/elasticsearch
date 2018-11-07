@@ -1,5 +1,6 @@
 package com.elastic.service;
 
+import com.elastic.elasticsearch.ElasticDeleteReturn;
 import com.elastic.elasticsearch.ElasticUpdateReturn;
 import com.elastic.elasticsearch.ElasticSearchResponse;
 import com.elastic.model.Agenda;
@@ -52,6 +53,11 @@ public class AgendaService {
         return getElasticUpdade(params, id);
     }
 
+    public ElasticDeleteReturn agendaUpdate(Long id) {
+        return getElasticDelete(id);
+    }
+
+
 
     private ElasticSearchResponse getElasticSearch() {
         try (NStringEntity entity = new NStringEntity("", ContentType.APPLICATION_JSON)) {
@@ -99,6 +105,22 @@ public class AgendaService {
             String json = EntityUtils.toString(response.getEntity());
 
             ElasticUpdateReturn results = gson.fromJson(json, ElasticUpdateReturn.class);
+            return results;
+
+        } catch (Exception e) {
+            LOGGER.error("Erro ao buscar os  dados no ElasticSearch.", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    private ElasticDeleteReturn getElasticDelete(Long id) {
+
+        try (NStringEntity entity = new NStringEntity("", ContentType.APPLICATION_JSON)) {
+            Response response = restClient.performRequest("DELETE", "/agenda/doc/"+id+"", new HashMap<>(), entity);
+            String json = EntityUtils.toString(response.getEntity());
+
+            ElasticDeleteReturn results = gson.fromJson(json, ElasticDeleteReturn.class);
             return results;
 
         } catch (Exception e) {
