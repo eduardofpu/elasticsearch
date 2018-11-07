@@ -2,6 +2,7 @@ package com.elastic.controller;
 
 import com.elastic.model.Agenda;
 import com.elastic.elasticsearch.ElasticSearchResponse;
+import com.elastic.model.AgendaRequest;
 import com.elastic.service.AgendaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,13 @@ public class AgendaController {
     @ResponseStatus(HttpStatus.OK)
     public ElasticSearchResponse getSearch() throws IOException {
         ElasticSearchResponse search = agendaService.getSearch();
+        return search;
+    }
+
+    @RequestMapping(path = "/prefix", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public ElasticSearchResponse getSearchPrefix(@RequestBody AgendaRequest request) throws IOException {
+        ElasticSearchResponse search = agendaService.getSearchPrefix(request);
         return search;
     }
 }

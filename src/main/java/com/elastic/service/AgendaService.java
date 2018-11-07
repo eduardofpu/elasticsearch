@@ -2,6 +2,7 @@ package com.elastic.service;
 
 import com.elastic.elasticsearch.ElasticSearchResponse;
 import com.elastic.model.Agenda;
+import com.elastic.model.AgendaRequest;
 import com.elastic.repository.AgendaRepository;
 import com.google.gson.Gson;
 import org.apache.http.entity.ContentType;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 @Service
 public class AgendaService {
@@ -40,8 +42,31 @@ public class AgendaService {
         return getElasticSearchResponse();
     }
 
+
+    public ElasticSearchResponse getSearchPrefix(AgendaRequest request) {
+
+        String params = "{\"query\" : {\"match_phrase_prefix\": " + gson.toJson(request) + " }}";
+        return getElasticSearchPrefixe(params);
+    }
+
+
     private ElasticSearchResponse getElasticSearchResponse() {
         try (NStringEntity entity = new NStringEntity("", ContentType.APPLICATION_JSON)) {
+            Response response = restClient.performRequest("GET", "/agenda/doc/_search", new HashMap<>(), entity);
+            String json = EntityUtils.toString(response.getEntity());
+
+            ElasticSearchResponse results = gson.fromJson(json, ElasticSearchResponse.class);
+            return results;
+
+        } catch (Exception e) {
+            LOGGER.error("Erro ao buscar os  dados no ElasticSearch.", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private ElasticSearchResponse getElasticSearchPrefixe(String params) {
+
+        try (NStringEntity entity = new NStringEntity(params, ContentType.APPLICATION_JSON)) {
             Response response = restClient.performRequest("GET", "/agenda/doc/_search", new HashMap<>(), entity);
             String json = EntityUtils.toString(response.getEntity());
 
