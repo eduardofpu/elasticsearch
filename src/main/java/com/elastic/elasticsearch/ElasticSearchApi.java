@@ -29,16 +29,12 @@ public class ElasticSearchApi<T> {
 
         if (esAuthToken.equals(authToken)) {
 
-            // deleta o indice já exite e cria novamente.
             try (NStringEntity entity = new NStringEntity("", ContentType.APPLICATION_JSON)) {
                 restClient.performRequest("DELETE", "/" + nameIndex, new HashMap<>(), entity);
-                //cria o indice
                 restClient.performRequest("PUT", "/" + nameIndex, new HashMap<>(), entity);
 
-                //Se o deletar falhar ele cria o indice
             } catch (Exception e) {
                 LOGGER.error("Erro ao deletar o indice no ES.", e);
-                // cria o indice.
                 try (NStringEntity entity = new NStringEntity("", ContentType.APPLICATION_JSON)) {
                     restClient.performRequest("PUT", "/" + nameIndex, new HashMap<>(), entity);
                 } catch (Exception ex) {
@@ -55,7 +51,6 @@ public class ElasticSearchApi<T> {
 
         if (esAuthToken.equals(authToken)) {
 
-            // deleta o indice .
             try (NStringEntity entity = new NStringEntity("", ContentType.APPLICATION_JSON)) {
                 restClient.performRequest("DELETE", "/" + request, new HashMap<>(), entity);
 
@@ -70,16 +65,17 @@ public class ElasticSearchApi<T> {
     }
 
     public static ElasticSearchResponse elasticSearch(String index) {
+
+
         try (NStringEntity entity = new NStringEntity("", ContentType.APPLICATION_JSON)) {
-            Response response = restClient.performRequest("GET", "/"+index+"/doc/_search", new HashMap<>(), entity);
-            String json = EntityUtils.toString(response.getEntity());
 
-            ElasticSearchResponse results = gson.fromJson(json, ElasticSearchResponse.class);
+                Response response = restClient.performRequest("GET", "/" + index + "/doc/_search", new HashMap<>(), entity);
 
-            if(results!=null){
+                String json = EntityUtils.toString(response.getEntity());
+                ElasticSearchResponse results = gson.fromJson(json, ElasticSearchResponse.class);
                 return results;
-            }
-            return null;
+
+
 
         } catch (Exception e) {
             LOGGER.error("Erro ao buscar os  dados no ElasticSearch.", e);
@@ -90,7 +86,7 @@ public class ElasticSearchApi<T> {
     public ElasticSearchResponse elasticSearchPrefixe(String index, T request) {
         String params = "{\"query\" : {\"match_phrase_prefix\": " + gson.toJson(request) + " }}";
         try (NStringEntity entity = new NStringEntity(params, ContentType.APPLICATION_JSON)) {
-            Response response = restClient.performRequest("GET", "/"+index+"/doc/_search", new HashMap<>(), entity);
+            Response response = restClient.performRequest("GET", "/" + index + "/doc/_search", new HashMap<>(), entity);
             String json = EntityUtils.toString(response.getEntity());
 
             ElasticSearchResponse results = gson.fromJson(json, ElasticSearchResponse.class);
@@ -102,10 +98,10 @@ public class ElasticSearchApi<T> {
         }
     }
 
-    public  void elasticCreate(String index, T request,    Long id) {
+    public void elasticCreate(String index, T request, Long id) {
         String params = gson.toJson(request);
         try (NStringEntity entity = new NStringEntity(params, ContentType.APPLICATION_JSON)) {
-            restClient.performRequest("POST", "/"+index+"/doc/"+id+"", new HashMap<>(), entity);
+            restClient.performRequest("POST", "/" + index + "/doc/" + id + "", new HashMap<>(), entity);
 
         } catch (Exception e) {
             LOGGER.error("Erro ao criar dados no elastic.", e);
@@ -113,10 +109,10 @@ public class ElasticSearchApi<T> {
         }
     }
 
-    public  ElasticUpdateReturn elasticUpdade(String index, T request, Long id) {
-        String params = "{\"doc\" : " + gson.toJson(request) +"}";
+    public ElasticUpdateReturn elasticUpdade(String index, T request, Long id) {
+        String params = "{\"doc\" : " + gson.toJson(request) + "}";
         try (NStringEntity entity = new NStringEntity(params, ContentType.APPLICATION_JSON)) {
-            Response response = restClient.performRequest("POST", "/"+index+"/doc/"+id+"/_update", new HashMap<>(), entity);
+            Response response = restClient.performRequest("POST", "/" + index + "/doc/" + id + "/_update", new HashMap<>(), entity);
             String json = EntityUtils.toString(response.getEntity());
 
             ElasticUpdateReturn results = gson.fromJson(json, ElasticUpdateReturn.class);
@@ -128,10 +124,10 @@ public class ElasticSearchApi<T> {
         }
     }
 
-    public  ElasticDeleteReturn elasticDeleteAttribute(String index, Long id) {
+    public ElasticDeleteReturn elasticDeleteAttribute(String index, Long id) {
 
         try (NStringEntity entity = new NStringEntity("", ContentType.APPLICATION_JSON)) {
-            Response response = restClient.performRequest("DELETE", "/"+index+"/doc/"+id+"", new HashMap<>(), entity);
+            Response response = restClient.performRequest("DELETE", "/" + index + "/doc/" + id + "", new HashMap<>(), entity);
             String json = EntityUtils.toString(response.getEntity());
 
             ElasticDeleteReturn results = gson.fromJson(json, ElasticDeleteReturn.class);

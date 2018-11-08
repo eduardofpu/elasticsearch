@@ -1,10 +1,9 @@
 package com.elastic.controller;
 
 import com.elastic.elasticsearch.ElasticDeleteReturn;
-import com.elastic.elasticsearch.ElasticError;
+import com.elastic.elasticsearch.ElasticSearchResponse;
 import com.elastic.elasticsearch.ElasticUpdateReturn;
 import com.elastic.model.Agenda;
-import com.elastic.elasticsearch.ElasticSearchResponse;
 import com.elastic.model.AgendaRequest;
 import com.elastic.repository.AgendaRepository;
 import com.elastic.service.AgendaService;
@@ -18,7 +17,7 @@ import java.io.IOException;
 @RequestMapping("/agenda")
 public class AgendaController {
 
-    private final String index = nameClass();
+    private final String INDEX = "agenda";
     private AgendaService agendaService;
     private AgendaRepository agendaRepository;
 
@@ -33,7 +32,7 @@ public class AgendaController {
     public Agenda createAgenda(@RequestBody Agenda request) throws IOException {
 
         agendaRepository.save(request);
-        this.agendaService.agendaCreate(index,request, request.getId());
+        this.agendaService.agendaCreate(INDEX, request, request.getId());
         return request;
     }
 
@@ -41,34 +40,28 @@ public class AgendaController {
     @RequestMapping(path = "/search", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public ElasticSearchResponse agendaSearch() throws IOException {
-        ElasticSearchResponse search = agendaService.agendaSearch(index);
+        ElasticSearchResponse search = agendaService.agendaSearch(INDEX);
         return search;
     }
 
     @RequestMapping(path = "/prefix", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public ElasticSearchResponse agendaSearchPrefix(@RequestBody AgendaRequest request) throws IOException {
-        ElasticSearchResponse search = agendaService.agendaSearchPrefix(index, request);
+        ElasticSearchResponse search = agendaService.agendaSearchPrefix(INDEX, request);
         return search;
     }
 
     @RequestMapping(path = "/update", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public ElasticUpdateReturn agendaUpdate(@RequestBody AgendaRequest request, @RequestHeader Long id) throws IOException {
-        ElasticUpdateReturn search = agendaService.agendaUpdate(index, request, id);
+        ElasticUpdateReturn search = agendaService.agendaUpdate(INDEX, request, id);
         return search;
     }
 
     @RequestMapping(path = "/delete", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public ElasticDeleteReturn agendaDelete(@RequestHeader Long id) throws IOException {
-        ElasticDeleteReturn search = agendaService.agendaUpdate(index, id);
+        ElasticDeleteReturn search = agendaService.agendaUpdate(INDEX, id);
         return search;
-    }
-
-    private String  nameClass() {
-        Class<Agenda> nameClasse = Agenda.class;
-        String agenda = nameClasse.getSimpleName().toLowerCase();
-        return agenda;
     }
 }

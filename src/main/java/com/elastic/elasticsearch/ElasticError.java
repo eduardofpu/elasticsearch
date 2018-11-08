@@ -11,4 +11,7 @@ public class ElasticError<T> implements Serializable {
     private T root_cause;
     private T type;
     private T status;
+
+
 }
+
